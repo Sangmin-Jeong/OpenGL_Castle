@@ -309,7 +309,7 @@ struct Cube : public Shape
 
 struct Prism : public Shape
 {
-	Prism(int sides)
+	Prism(int sides, GLfloat x = 1.0f, GLfloat y = 1.0f, GLfloat z = 1.0f)
 	{
 		float theta = 0.0f;
 		// Top face.
@@ -378,8 +378,44 @@ struct Prism : public Shape
 			shape_uvs.push_back(0); // No texture, so value doesn't matter.
 			shape_uvs.push_back(0);
 		}
+		RescaleUV(x, y, z);
 		ColorShape(1.0f, 1.0f, 1.0f);
 		CalcAverageNormals(shape_indices, shape_indices.size(), shape_vertices, shape_vertices.size());
+	}
+	void RescaleUV(GLfloat x, GLfloat y, GLfloat z)
+	{
+		shape_uvs = {
+			// Front.
+			0.0f, 0.0f, 	// 0.
+			x, 0.0f, 		// 1. 
+			x, y, 			// 2. 
+			0.0f, y,		// 3. 
+			// Right.
+			0.0f, 0.0f, 	// 1.
+			z, 0.0f, 		// 5.
+			z, y, 			// 6.
+			0.0f, y,		// 2.
+			// Back.
+			0.0f, 0.0f, 	// 5.
+			x, 0.0f, 		// 4.
+			x, y,			// 7.
+			0.0f, y,		// 6.
+			// Left.
+			0.0f, 0.0f,		// 4.
+			z, 0.0f,		// 0.
+			z, y,			// 3.
+			0.0f, y,		// 7.
+			// Top.
+			0.0f, z / 2,		// 7.
+			0.0f, 0.0f,		// 3.
+			x, 0.0f,		// 2.
+			x, z / 2,			// 6.
+			// Bottom.
+			0.0f, 0.0f,		// 4.
+			x, 0.0f,		// 5.
+			x, z / 2,			// 1.
+			0.0f, z / 2		// 0.
+		};
 	}
 };
 
