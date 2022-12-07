@@ -107,11 +107,15 @@ Cube left_wall(80.0f, 8.0f, 3.0f);
 Cube right_wall(80.0f, 8.0f, 3.0f);
 Cube back_wall(80.0f, 8.0f, 3.0f);
 
-// Towers
-Prism frontLeft_tower(12, 5.0f, 12.0f, 5.0f);
-Prism frontRight_tower(12, 5.0f, 12.0f, 5.0f);
-Prism backLeft_tower(12, 5.0f, 12.0f, 5.0f);
-Prism backRight_tower(12, 5.0f, 12.0f, 5.0f);
+// Towers and Cones
+Prism frontLeft_tower(12);
+Cone frontLeft_cone(12);
+
+Prism frontRight_tower(12);
+Prism backLeft_tower(12);
+Prism backRight_tower(12);
+
+
 
 
 
@@ -206,8 +210,9 @@ void init(void)
 	left_wall.BufferShape();
 	back_wall.BufferShape();
 
-	// Towers
+	// Towers and Cones
 	frontLeft_tower.BufferShape();
+	frontLeft_cone.BufferShape();
 	frontRight_tower.BufferShape();
 	backLeft_tower.BufferShape();
 	backRight_tower.BufferShape();
@@ -258,36 +263,47 @@ void display(void)
 	
 	// Grid.
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	g_grid.DrawShape(GL_LINE_STRIP);
+	g_grid.DrawShape(GL_LINE_STRIP, program);
 
 	// Walls.
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -10.0f));
-	front_wall.DrawShape(GL_TRIANGLES);
+	front_wall.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 90.0f, glm::vec3(10.0f, 0.0f, -10.0f));
-	left_wall.DrawShape(GL_TRIANGLES);
+	left_wall.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 90.0f, glm::vec3(87.0f, 0.0f, -10.0f));
-	right_wall.DrawShape(GL_TRIANGLES);
+	right_wall.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -90.0f));
-	back_wall.DrawShape(GL_TRIANGLES);
+	back_wall.DrawShape(GL_TRIANGLES, program);
 
 
-	// Towers
+	// Towers and Cones
 	glBindTexture(GL_TEXTURE_2D, brickID);
-	transformObject(glm::vec3(8.0f, 12.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -13.0f));
-	frontLeft_tower.DrawShape(GL_TRIANGLES);
+	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -13.0f));
+	frontLeft_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -13.5f));
+	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
+
 	glBindTexture(GL_TEXTURE_2D, brickID);
-	transformObject(glm::vec3(8.0f, 12.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -12.0f));
-	frontRight_tower.DrawShape(GL_TRIANGLES);
+	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -13.0f));
+	frontRight_tower.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
-	transformObject(glm::vec3(8.0f, 12.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -93.0f));
-	backLeft_tower.DrawShape(GL_TRIANGLES);
+	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -93.0f));
+	backLeft_tower.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
-	transformObject(glm::vec3(8.0f, 12.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -93.0f));
-	backRight_tower.DrawShape(GL_TRIANGLES);
+	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -93.0f));
+	backRight_tower.DrawShape(GL_TRIANGLES, program);
+
+	// Towers for the main gate
+	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(6.0f, 10.0f, 6.0f), X_AXIS, 0.0f, glm::vec3(40.0f, 0.0f, -12.0f));
+	frontLeft_tower.DrawShape(GL_TRIANGLES, program);
+	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(6.0f, 10.0f, 6.0f), X_AXIS, 0.0f, glm::vec3(60.0f, 0.0f, -12.0f));
+	frontRight_tower.DrawShape(GL_TRIANGLES, program);
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	

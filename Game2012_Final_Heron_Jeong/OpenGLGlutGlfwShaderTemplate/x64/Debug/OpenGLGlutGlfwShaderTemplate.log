@@ -1,21 +1,22 @@
 ﻿  Game2012_Final_Heron_Jeong.cpp
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(32,23): warning C4267: 'return': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(154,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(166,30): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(38,23): warning C4267: 'return': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(103,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(173,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(185,30): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=GLfloat
           ]
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(167,30): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(186,30): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=GLfloat
           ]
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(210,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(271,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(324,20): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(335,20): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(383,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(436,20): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(467,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(229,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(321,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(339,20): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(355,20): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(412,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(430,20): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\OpenGLGlutGlfwShaderTemplate\Shape.h(482,1): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
   OpenGLGlutGlfwShaderTemplate.vcxproj -> C:\Users\serim\source\repos\F2022\Game2012_Final_Heron_Jeong\Game2012_Final_Heron_Jeong\x64\Debug\OpenGLGlutGlfwShaderTemplate.exe
