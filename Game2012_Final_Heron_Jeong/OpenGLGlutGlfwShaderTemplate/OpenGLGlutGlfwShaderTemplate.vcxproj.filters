@@ -54,15 +54,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="alex.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="gizmo.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="wook.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="blank.jpg">
       <Filter>Resource Files</Filter>
     </Image>

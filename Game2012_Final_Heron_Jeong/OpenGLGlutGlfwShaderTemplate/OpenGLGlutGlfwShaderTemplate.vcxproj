@@ -40,11 +40,8 @@
     <None Include="cube3.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="alex.jpg" />
     <Image Include="blank.jpg" />
     <Image Include="brick.jpg" />
-    <Image Include="gizmo.png" />
-    <Image Include="wook.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -106,16 +106,20 @@ Cube front_wall(80.0f,8.0f,3.0f);
 Cube left_wall(80.0f, 8.0f, 3.0f);
 Cube right_wall(80.0f, 8.0f, 3.0f);
 Cube back_wall(80.0f, 8.0f, 3.0f);
+Cube merlons(1.0f, 1.0f, 1.0f);
 
 // Towers and Cones
 Prism frontLeft_tower(12);
 Cone frontLeft_cone(12);
 
 Prism frontRight_tower(12);
+Cone frontRight_cone(12);
+
 Prism backLeft_tower(12);
+Cone backLeft_cone(12);
+
 Prism backRight_tower(12);
-
-
+Cone backRight_cone(12);
 
 
 
@@ -165,11 +169,11 @@ void init(void)
 	glBindTexture(GL_TEXTURE_2D, blankID);
 	// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	 //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_LINEAR_MIPMAP_LINEAR
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(image);
 	// End first image.
@@ -209,16 +213,26 @@ void init(void)
 	right_wall.BufferShape();
 	left_wall.BufferShape();
 	back_wall.BufferShape();
+	merlons.BufferShape();
 
 	// Towers and Cones
 	frontLeft_tower.BufferShape();
 	frontLeft_cone.BufferShape();
 	frontRight_tower.BufferShape();
+	frontRight_cone.BufferShape();
 	backLeft_tower.BufferShape();
+	backLeft_cone.BufferShape();
 	backRight_tower.BufferShape();
+	backRight_cone.BufferShape();
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendEquation(GL_FUNC_ADD);
+
+	//glEnable(GL_LINE_SMOOTH);
+	//glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
@@ -256,10 +270,43 @@ void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngl
 	glUniformMatrix4fv(projID, 1, GL_FALSE, &Projection[0][0]);
 }
 
+void BuildBattlementsX(int size, float x, float y, float z)
+{
+	float x1 = x, y1 = y, z1 = z;
+	for (int i = 0; i < size; i += 3)
+	{
+		glBindTexture(GL_TEXTURE_2D, brickID);
+		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
+		merlons.DrawShape(GL_TRIANGLES, program);
+		x1++;
+		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
+		merlons.DrawShape(GL_TRIANGLES, program);
+		x1++;
+		x1++;
+	}
+}
+
+void BuildBattlementsZ(int size, float x, float y, float z)
+{
+	float x1 = x, y1 = y, z1 = z;
+	for (int i = 0; i < size; i += 3)
+	{
+		glBindTexture(GL_TEXTURE_2D, brickID);
+		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
+		merlons.DrawShape(GL_TRIANGLES, program);
+		z1--;
+		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
+		merlons.DrawShape(GL_TRIANGLES, program);
+		z1--;
+		z1--;
+	}
+}
+
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindTexture(GL_TEXTURE_2D, blankID); 
+	glBindTexture(GL_TEXTURE_2D, blankID);
+	glBindTexture(GL_TEXTURE_2D, brickID);
 	
 	// Grid.
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -269,41 +316,53 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -10.0f));
 	front_wall.DrawShape(GL_TRIANGLES, program);
-	glBindTexture(GL_TEXTURE_2D, brickID);
+	BuildBattlementsX(77, 14.0f, 8.0f, -8.0f);
+
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 90.0f, glm::vec3(10.0f, 0.0f, -10.0f));
 	left_wall.DrawShape(GL_TRIANGLES, program);
-	glBindTexture(GL_TEXTURE_2D, brickID);
+	BuildBattlementsZ(77, 10.0f, 8.0f, -8.0f);
+
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 90.0f, glm::vec3(87.0f, 0.0f, -10.0f));
 	right_wall.DrawShape(GL_TRIANGLES, program);
-	glBindTexture(GL_TEXTURE_2D, brickID);
+	BuildBattlementsZ(77, 89.0f, 8.0f, -8.0f);
+
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -90.0f));
 	back_wall.DrawShape(GL_TRIANGLES, program);
+	BuildBattlementsX(77, 14.0f, 8.0f, -90.0f);
 
 
-	// Towers and Cones
+	// Towers with Cones
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -13.0f));
 	frontLeft_tower.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -13.5f));
 	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
 
-	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -13.0f));
 	frontRight_tower.DrawShape(GL_TRIANGLES, program);
-	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(84.5f, 13.0f, -13.5f));
+	frontRight_cone.DrawShape(GL_TRIANGLES, program);
+
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -93.0f));
 	backLeft_tower.DrawShape(GL_TRIANGLES, program);
-	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -93.5f));
+	backLeft_cone.DrawShape(GL_TRIANGLES, program);
+
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -93.0f));
 	backRight_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(84.5f, 13.0f, -93.5f));
+	backRight_cone.DrawShape(GL_TRIANGLES, program);
 
 	// Towers for the main gate
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(6.0f, 10.0f, 6.0f), X_AXIS, 0.0f, glm::vec3(40.0f, 0.0f, -12.0f));
 	frontLeft_tower.DrawShape(GL_TRIANGLES, program);
-	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(39.5f, 10.0f, -12.5f));
+	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(6.0f, 10.0f, 6.0f), X_AXIS, 0.0f, glm::vec3(60.0f, 0.0f, -12.0f));
 	frontRight_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(59.5f, 10.0f, -12.5f));
+	frontRight_cone.DrawShape(GL_TRIANGLES, program);
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
