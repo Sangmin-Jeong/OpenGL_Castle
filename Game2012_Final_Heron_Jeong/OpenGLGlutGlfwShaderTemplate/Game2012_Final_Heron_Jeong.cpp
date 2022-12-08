@@ -81,7 +81,7 @@ glm::mat4 View, Projection;
 unsigned char keys = 0; // Initialized to 0 or 0b00000000.
 
 // Texture variables.
-GLuint blankID, brickID, doorID, grassID;
+GLuint blankID, brickID, doorID, grassID, woodID;
 GLint width, height, bitDepth;
 
 // Light objects. Now OOP.
@@ -90,23 +90,23 @@ AmbientLight aLight(
 	0.5f);
 
 PointLight pLights[2] = {
-	{ glm::vec3(50.0f, 1.0f, -50.0f),	// Position.
-	1.0f,							// Range.
+	{ glm::vec3(50.0f, 10.0f, 0.0f),	// Position.
+	100.0f,							// Range.
 	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
-	glm::vec3(0.1f, 0.2f, 1.0f),	// Diffuse colour.
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f },							// Diffuse strength.
 
-	{ glm::vec3(50.0f, 1.0f, -50.f),	// Position.
-	1.0f,							// Range.
+	{ glm::vec3(50.0f, 20.0f, -30.f),	// Position.
+	1000.0f,							// Range.
 	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
-	glm::vec3(1.0f, 0.2f, 0.2f),	// Diffuse colour.
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f } };						// Diffuse strength.
 
 PointLight pLight =
-{ glm::vec3(50.0f, 1.0f, -50.0f),	// Position.
-1.0f,							// Range.
+{ glm::vec3(50.0f, 10.0f, -100.0f),	// Position.
+100.0f,							// Range.
 1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
-glm::vec3(1.0f, 0.0f, 1.0f),	// Diffuse colour.
+glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 1.0f };
 
 // Camera and transform variables.
@@ -121,7 +121,7 @@ Grid g_grid(100);
 // Ground
 Plane ground;
 
-// Walls
+// Outer walls
 Cube front_wall(80.0f,8.0f,3.0f);
 Cube left_wall(80.0f, 8.0f, 3.0f);
 Cube right_wall(80.0f, 8.0f, 3.0f);
@@ -143,6 +143,9 @@ Cone backRight_cone(12);
 
 // Gate
 Plane gate;
+
+// Keep
+Cube inner_tower(5.0f, 30.0f, 5.0f);
 
 void timer(int); // Prototype.
 
@@ -212,24 +215,8 @@ void init(void)
 	// Image loading.
 	stbi_set_flip_vertically_on_load(true);
 
-	// Load first image.
-	unsigned char* image;
-	image = stbi_load("blank.jpg", &width, &height, &bitDepth, 0);
-	if (!image) { cout << "Unable to load file!" << endl; }
-	glGenTextures(1, &blankID);
-	glBindTexture(GL_TEXTURE_2D, blankID);
-	// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	 //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // GL_LINEAR_MIPMAP_LINEAR
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(image);
-	// End first image.
 
-	// Load second image.
+	unsigned char* image;
 	image = stbi_load("brick.jpg", &width, &height, &bitDepth, 0);
 	if (!image) { cout << "Unable to load file!" << endl; }
 	glGenTextures(1, &brickID);
@@ -272,6 +259,20 @@ void init(void)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(image);
 
+	image = stbi_load("wood.jpg", &width, &height, &bitDepth, 0);
+	if (!image) { cout << "Unable to load file!" << endl; }
+	glGenTextures(1, &woodID);
+	glBindTexture(GL_TEXTURE_2D, woodID);
+	// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(image);
+	
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
 	SetupLights();
@@ -301,6 +302,9 @@ void init(void)
 
 	// Gate
 	gate.BufferShape();
+
+	// Keep
+	inner_tower.BufferShape();
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -400,8 +404,6 @@ void DrawPlane(int size)
 
 void display(void)
 {
-	SetupLights();
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	// Grid.
@@ -412,7 +414,7 @@ void display(void)
 	// Ground
 	DrawPlane(100);
 
-	// Walls.
+	// Outer walls.
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -10.0f));
 	front_wall.DrawShape(GL_TRIANGLES, program);
@@ -468,10 +470,88 @@ void display(void)
 	transformObject(glm::vec3(4.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.5f, -7.0f));
 	cube.DrawShape(GL_TRIANGLES, program);
 
+	// Main gate
 	glBindTexture(GL_TEXTURE_2D, doorID);
 	transformObject(glm::vec3(10.0f, 6.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 1.0f, -6.0f));
 	gate.DrawShape(GL_TRIANGLES, program);
+
+	// Keep
 	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(5.0f, 30.0f, 5.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 0.0f, -45.0f));
+	inner_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(38.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -41.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(38.0f, 30.0f, -41.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(39.0f, 30.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(39.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+
+	transformObject(glm::vec3(5.0f, 30.0f, 5.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 0.0f, -45.0f));
+	inner_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(68.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -41.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(68.0f, 30.0f, -41.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(69.0f, 30.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(69.0f, 30.0f, -45.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+
+	transformObject(glm::vec3(5.0f, 30.0f, 5.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 0.0f, -75.0f));
+	inner_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(38.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -71.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(38.0f, 30.0f, -71.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -72.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(39.0f, 30.0f, -72.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(39.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+
+	transformObject(glm::vec3(5.0f, 30.0f, 5.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 0.0f, -75.0f));
+	inner_tower.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(68.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -71.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(68.0f, 30.0f, -71.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(65.0f, 30.0f, -72.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(69.0f, 30.0f, -72.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(69.0f, 30.0f, -75.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
 
 
 	
