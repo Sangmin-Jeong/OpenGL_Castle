@@ -81,16 +81,33 @@ glm::mat4 View, Projection;
 unsigned char keys = 0; // Initialized to 0 or 0b00000000.
 
 // Texture variables.
-GLuint blankID, brickID;
+GLuint blankID, brickID, doorID;
 GLint width, height, bitDepth;
 
-// Light variables. Will eventually make OOP.
-glm::vec3 ambientColor = glm::vec3(1.0f, 1.0f, 1.0f);
-GLfloat ambientStrength = 0.1f;
+// Light objects. Now OOP.
+AmbientLight aLight(
+	glm::vec3(1.0f, 1.0f, 0.9f),	// Diffuse colour.
+	0.5f);
 
-glm::vec3 dirColor = glm::vec3(1.0f, 1.0f, 1.0f);
-glm::vec3 lightDirection = glm::vec3(1.0f, 1.0f, 1.0f); // Actually more like origin.
-GLfloat dirStrength = 1.0f;
+PointLight pLights[2] = {
+	{ glm::vec3(50.0f, 1.0f, -50.0f),	// Position.
+	1.0f,							// Range.
+	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
+	glm::vec3(0.1f, 0.2f, 1.0f),	// Diffuse colour.
+	1.0f },							// Diffuse strength.
+
+	{ glm::vec3(50.0f, 1.0f, -50.f),	// Position.
+	1.0f,							// Range.
+	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
+	glm::vec3(1.0f, 0.2f, 0.2f),	// Diffuse colour.
+	1.0f } };						// Diffuse strength.
+
+PointLight pLight =
+{ glm::vec3(50.0f, 1.0f, -50.0f),	// Position.
+1.0f,							// Range.
+1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
+glm::vec3(1.0f, 0.0f, 1.0f),	// Diffuse colour.
+1.0f };
 
 // Camera and transform variables.
 float scale = 1.0f, angle = 0.0f;
@@ -106,7 +123,7 @@ Cube front_wall(80.0f,8.0f,3.0f);
 Cube left_wall(80.0f, 8.0f, 3.0f);
 Cube right_wall(80.0f, 8.0f, 3.0f);
 Cube back_wall(80.0f, 8.0f, 3.0f);
-Cube merlons(1.0f, 1.0f, 1.0f);
+Cube cube(1.0f, 1.0f, 1.0f);
 
 // Towers and Cones
 Prism frontLeft_tower(12);
@@ -121,13 +138,14 @@ Cone backLeft_cone(12);
 Prism backRight_tower(12);
 Cone backRight_cone(12);
 
-
+// Gate
+Plane gate;
 
 void timer(int); // Prototype.
 
 void resetView()
 {
-	position = glm::vec3(10.0f, 5.0f, 25.0f); // Super pulled back because of grid size.
+	position = glm::vec3(53.0f, 3.0f, 25.0f); // Super pulled back because of grid size.
 	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0.0f;
@@ -173,7 +191,7 @@ void init(void)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // GL_LINEAR_MIPMAP_LINEAR
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // GL_LINEAR_MIPMAP_LINEAR
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(image);
 	// End first image.
@@ -192,18 +210,48 @@ void init(void)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(image);
-	// End first image.
+
+	image = stbi_load("door.png", &width, &height, &bitDepth, 0);
+	if (!image) { cout << "Unable to load file!" << endl; }
+	glGenTextures(1, &doorID);
+	glBindTexture(GL_TEXTURE_2D, doorID);
+	// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(image);
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
 	// Setting ambient light.
-	glUniform3f(glGetUniformLocation(program, "ambientColor"), ambientColor.x, ambientColor.y, ambientColor.z);
-	glUniform1f(glGetUniformLocation(program, "ambientStrength"), ambientStrength);
+	glUniform3f(glGetUniformLocation(program, "aLight.base.diffuseColour"), aLight.diffuseColour.x, aLight.diffuseColour.y, aLight.diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "aLight.base.diffuseStrength"), aLight.diffuseStrength);
 
-	// Setting directional light.
-	glUniform3f(glGetUniformLocation(program, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
-	glUniform3f(glGetUniformLocation(program, "dirColor"), dirColor.x, dirColor.y, dirColor.z);
-	glUniform1f(glGetUniformLocation(program, "dirStrength"), dirStrength);
+	// Setting point lights.
+	glUniform3f(glGetUniformLocation(program, "pLights[0].base.diffuseColour"), pLights[0].diffuseColour.x, pLights[0].diffuseColour.y, pLights[0].diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].base.diffuseStrength"), pLights[0].diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLights[0].position"), pLights[0].position.x, pLights[0].position.y, pLights[0].position.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].constant"), pLights[0].constant);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].linear"), pLights[0].linear);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].quadratic"), pLights[0].quadratic);
+
+	glUniform3f(glGetUniformLocation(program, "pLights[1].base.diffuseColour"), pLights[1].diffuseColour.x, pLights[1].diffuseColour.y, pLights[1].diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].base.diffuseStrength"), pLights[1].diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLights[1].position"), pLights[1].position.x, pLights[1].position.y, pLights[1].position.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].constant"), pLights[1].constant);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].linear"), pLights[1].linear);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].quadratic"), pLights[1].quadratic);
+
+	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColour"), pLight.diffuseColour.x, pLight.diffuseColour.y, pLight.diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLight.base.diffuseStrength"), pLight.diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLight.position"), pLight.position.x, pLight.position.y, pLight.position.z);
+	glUniform1f(glGetUniformLocation(program, "pLight.constant"), pLight.constant);
+	glUniform1f(glGetUniformLocation(program, "pLight.linear"), pLight.linear);
+	glUniform1f(glGetUniformLocation(program, "pLight.quadratic"), pLight.quadratic);
 
 	// All VAO/VBO data now in Shape.h! But we still need to do this AFTER OpenGL is initialized.
 	g_grid.BufferShape();
@@ -213,7 +261,7 @@ void init(void)
 	right_wall.BufferShape();
 	left_wall.BufferShape();
 	back_wall.BufferShape();
-	merlons.BufferShape();
+	cube.BufferShape();
 
 	// Towers and Cones
 	frontLeft_tower.BufferShape();
@@ -225,17 +273,20 @@ void init(void)
 	backRight_tower.BufferShape();
 	backRight_cone.BufferShape();
 
+	// Gate
+	gate.BufferShape();
+
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendEquation(GL_FUNC_ADD);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
 
-	//glEnable(GL_LINE_SMOOTH);
-	//glEnable(GL_POLYGON_SMOOTH);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
+	//glCullFace(GL_BACK);
 
 	timer(0); // Setup my recursive 'fixed' timestep/framerate.
 }
@@ -253,6 +304,9 @@ void calculateView()
 		position, // Camera position
 		position + frontVec, // Look target
 		upVec); // Up vector
+
+	glUniform3f(glGetUniformLocation(program, "eyePosition"), position.x, position.y, position.z);
+
 }
 
 void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngle, glm::vec3 translation) {
@@ -277,10 +331,10 @@ void BuildBattlementsX(int size, float x, float y, float z)
 	{
 		glBindTexture(GL_TEXTURE_2D, brickID);
 		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
-		merlons.DrawShape(GL_TRIANGLES, program);
+		cube.DrawShape(GL_TRIANGLES, program);
 		x1++;
 		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
-		merlons.DrawShape(GL_TRIANGLES, program);
+		cube.DrawShape(GL_TRIANGLES, program);
 		x1++;
 		x1++;
 	}
@@ -293,10 +347,10 @@ void BuildBattlementsZ(int size, float x, float y, float z)
 	{
 		glBindTexture(GL_TEXTURE_2D, brickID);
 		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
-		merlons.DrawShape(GL_TRIANGLES, program);
+		cube.DrawShape(GL_TRIANGLES, program);
 		z1--;
 		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), Y_AXIS, 0.0f, glm::vec3(x1, y1, z1));
-		merlons.DrawShape(GL_TRIANGLES, program);
+		cube.DrawShape(GL_TRIANGLES, program);
 		z1--;
 		z1--;
 	}
@@ -306,7 +360,6 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, blankID);
-	glBindTexture(GL_TEXTURE_2D, brickID);
 	
 	// Grid.
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -363,6 +416,17 @@ void display(void)
 	frontRight_tower.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(59.5f, 10.0f, -12.5f));
 	frontRight_cone.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(4.0f, 0.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.0f, -7.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(4.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.5f, -7.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+
+	glBindTexture(GL_TEXTURE_2D, doorID);
+	transformObject(glm::vec3(10.0f, 6.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 1.0f, -6.0f));
+	gate.DrawShape(GL_TRIANGLES, program);
+	glBindTexture(GL_TEXTURE_2D, brickID);
+
+
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
