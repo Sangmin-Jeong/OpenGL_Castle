@@ -52,6 +52,7 @@ using namespace std;
 #define XY_AXIS glm::vec3(1,0.9,0)
 #define YZ_AXIS glm::vec3(0,1,1)
 #define XZ_AXIS glm::vec3(1,0,1)
+#define XYZ_AXIS glm::vec3(1,1,1)
 #define SPEED 0.25f
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -96,7 +97,7 @@ PointLight pLights[2] = {
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f },							// Diffuse strength.
 
-	{ glm::vec3(50.0f, 40.0f, -30.f),	// Position.
+	{ glm::vec3(50.0f, 44.0f, -50.f),	// Position.
 	1000.0f,							// Range.
 	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
@@ -420,7 +421,7 @@ void display(void)
 
 	// Outer walls.
 	glBindTexture(GL_TEXTURE_2D, brickID);
-	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), Y_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -10.0f));
+	transformObject(glm::vec3(80.0f, 8.0f, 3.0f), XY_AXIS, 0.0f, glm::vec3(10.0f, 0.0f, -10.0f));
 	front_wall.DrawShape(GL_TRIANGLES, program);
 	BuildBattlementsX(77, 14.0f, 8.0f, -8.0f);
 
@@ -509,6 +510,14 @@ void display(void)
 	gate.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
 
+	// Roof
+	glBindTexture(GL_TEXTURE_2D, woodID);
+	transformObject(glm::vec3(20.0f, 20.0f, 20.0f), X_AXIS, 45.0f,  glm::vec3(42.5f, 26.0f, -73.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	glBindTexture(GL_TEXTURE_2D, brickID);
+
+
+	// Keep's tower
 	transformObject(glm::vec3(5.0f, 30.0f, 5.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 0.0f, -45.0f));
 	inner_tower.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -45.0f));
