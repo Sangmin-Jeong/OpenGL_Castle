@@ -81,7 +81,7 @@ glm::mat4 View, Projection;
 unsigned char keys = 0; // Initialized to 0 or 0b00000000.
 
 // Texture variables.
-GLuint blankID, brickID, doorID;
+GLuint blankID, brickID, doorID, grassID;
 GLint width, height, bitDepth;
 
 // Light objects. Now OOP.
@@ -118,6 +118,9 @@ int lastX, lastY;
 // Geometry data.
 Grid g_grid(100);
 
+// Ground
+Plane ground;
+
 // Walls
 Cube front_wall(80.0f,8.0f,3.0f);
 Cube left_wall(80.0f, 8.0f, 3.0f);
@@ -153,6 +156,35 @@ void resetView()
 	// View will now get set only in transformObject
 }
 
+void SetupLights()
+{
+	// Setting ambient light.
+	glUniform3f(glGetUniformLocation(program, "aLight.base.diffuseColour"), aLight.diffuseColour.x, aLight.diffuseColour.y, aLight.diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "aLight.base.diffuseStrength"), aLight.diffuseStrength);
+
+	// Setting point lights.
+	glUniform3f(glGetUniformLocation(program, "pLights[0].base.diffuseColour"), pLights[0].diffuseColour.x, pLights[0].diffuseColour.y, pLights[0].diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].base.diffuseStrength"), pLights[0].diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLights[0].position"), pLights[0].position.x, pLights[0].position.y, pLights[0].position.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].constant"), pLights[0].constant);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].linear"), pLights[0].linear);
+	glUniform1f(glGetUniformLocation(program, "pLights[0].quadratic"), pLights[0].quadratic);
+
+	glUniform3f(glGetUniformLocation(program, "pLights[1].base.diffuseColour"), pLights[1].diffuseColour.x, pLights[1].diffuseColour.y, pLights[1].diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].base.diffuseStrength"), pLights[1].diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLights[1].position"), pLights[1].position.x, pLights[1].position.y, pLights[1].position.z);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].constant"), pLights[1].constant);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].linear"), pLights[1].linear);
+	glUniform1f(glGetUniformLocation(program, "pLights[1].quadratic"), pLights[1].quadratic);
+
+	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColour"), pLight.diffuseColour.x, pLight.diffuseColour.y, pLight.diffuseColour.z);
+	glUniform1f(glGetUniformLocation(program, "pLight.base.diffuseStrength"), pLight.diffuseStrength);
+	glUniform3f(glGetUniformLocation(program, "pLight.position"), pLight.position.x, pLight.position.y, pLight.position.z);
+	glUniform1f(glGetUniformLocation(program, "pLight.constant"), pLight.constant);
+	glUniform1f(glGetUniformLocation(program, "pLight.linear"), pLight.linear);
+	glUniform1f(glGetUniformLocation(program, "pLight.quadratic"), pLight.quadratic);
+}
+
 void init(void)
 {
 	srand((unsigned)time(NULL));
@@ -181,7 +213,8 @@ void init(void)
 	stbi_set_flip_vertically_on_load(true);
 
 	// Load first image.
-	unsigned char* image = stbi_load("blank.jpg", &width, &height, &bitDepth, 0);
+	unsigned char* image;
+	image = stbi_load("blank.jpg", &width, &height, &bitDepth, 0);
 	if (!image) { cout << "Unable to load file!" << endl; }
 	glGenTextures(1, &blankID);
 	glBindTexture(GL_TEXTURE_2D, blankID);
@@ -225,36 +258,29 @@ void init(void)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(image);
 
+	image = stbi_load("grass2.png", &width, &height, &bitDepth, 0);
+	if (!image) { cout << "Unable to load file!" << endl; }
+	glGenTextures(1, &grassID);
+	glBindTexture(GL_TEXTURE_2D, grassID);
+	// Note: image types with native transparency will need to be GL_RGBA instead of GL_RGB.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(image);
+
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
-	// Setting ambient light.
-	glUniform3f(glGetUniformLocation(program, "aLight.base.diffuseColour"), aLight.diffuseColour.x, aLight.diffuseColour.y, aLight.diffuseColour.z);
-	glUniform1f(glGetUniformLocation(program, "aLight.base.diffuseStrength"), aLight.diffuseStrength);
-
-	// Setting point lights.
-	glUniform3f(glGetUniformLocation(program, "pLights[0].base.diffuseColour"), pLights[0].diffuseColour.x, pLights[0].diffuseColour.y, pLights[0].diffuseColour.z);
-	glUniform1f(glGetUniformLocation(program, "pLights[0].base.diffuseStrength"), pLights[0].diffuseStrength);
-	glUniform3f(glGetUniformLocation(program, "pLights[0].position"), pLights[0].position.x, pLights[0].position.y, pLights[0].position.z);
-	glUniform1f(glGetUniformLocation(program, "pLights[0].constant"), pLights[0].constant);
-	glUniform1f(glGetUniformLocation(program, "pLights[0].linear"), pLights[0].linear);
-	glUniform1f(glGetUniformLocation(program, "pLights[0].quadratic"), pLights[0].quadratic);
-
-	glUniform3f(glGetUniformLocation(program, "pLights[1].base.diffuseColour"), pLights[1].diffuseColour.x, pLights[1].diffuseColour.y, pLights[1].diffuseColour.z);
-	glUniform1f(glGetUniformLocation(program, "pLights[1].base.diffuseStrength"), pLights[1].diffuseStrength);
-	glUniform3f(glGetUniformLocation(program, "pLights[1].position"), pLights[1].position.x, pLights[1].position.y, pLights[1].position.z);
-	glUniform1f(glGetUniformLocation(program, "pLights[1].constant"), pLights[1].constant);
-	glUniform1f(glGetUniformLocation(program, "pLights[1].linear"), pLights[1].linear);
-	glUniform1f(glGetUniformLocation(program, "pLights[1].quadratic"), pLights[1].quadratic);
-
-	glUniform3f(glGetUniformLocation(program, "pLight.base.diffuseColour"), pLight.diffuseColour.x, pLight.diffuseColour.y, pLight.diffuseColour.z);
-	glUniform1f(glGetUniformLocation(program, "pLight.base.diffuseStrength"), pLight.diffuseStrength);
-	glUniform3f(glGetUniformLocation(program, "pLight.position"), pLight.position.x, pLight.position.y, pLight.position.z);
-	glUniform1f(glGetUniformLocation(program, "pLight.constant"), pLight.constant);
-	glUniform1f(glGetUniformLocation(program, "pLight.linear"), pLight.linear);
-	glUniform1f(glGetUniformLocation(program, "pLight.quadratic"), pLight.quadratic);
+	SetupLights();
 
 	// All VAO/VBO data now in Shape.h! But we still need to do this AFTER OpenGL is initialized.
 	g_grid.BufferShape();
+
+	// Ground
+	ground.BufferShape();
 
 	// Walls
 	front_wall.BufferShape();
@@ -356,14 +382,35 @@ void BuildBattlementsZ(int size, float x, float y, float z)
 	}
 }
 
+void DrawPlane(int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, grassID);
+		transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(i, 0.0f, 0.0f));
+		ground.DrawShape(GL_TRIANGLES, program);
+
+		for (int j = 1; j < size; j++)
+		{
+			transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(i, 0.0f, -j));
+			ground.DrawShape(GL_TRIANGLES, program);
+		}
+	}
+}
+
 void display(void)
 {
+	SetupLights();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindTexture(GL_TEXTURE_2D, blankID);
 	
 	// Grid.
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	g_grid.DrawShape(GL_LINE_STRIP, program);
+	//glBindTexture(GL_TEXTURE_2D, blankID);
+	//transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+	//g_grid.DrawShape(GL_LINE_STRIP, program);
+
+	// Ground
+	DrawPlane(100);
 
 	// Walls.
 	glBindTexture(GL_TEXTURE_2D, brickID);
