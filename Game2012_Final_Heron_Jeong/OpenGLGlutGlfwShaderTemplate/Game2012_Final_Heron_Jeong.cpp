@@ -96,7 +96,7 @@ PointLight pLights[2] = {
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f },							// Diffuse strength.
 
-	{ glm::vec3(50.0f, 20.0f, -30.f),	// Position.
+	{ glm::vec3(50.0f, 40.0f, -30.f),	// Position.
 	1000.0f,							// Range.
 	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
@@ -146,6 +146,8 @@ Plane gate;
 
 // Keep
 Cube inner_tower(5.0f, 30.0f, 5.0f);
+Cube keep(31.0f, 28.0f, 31.0f);
+Cube entrance(10.0f, 15.0f, 10.0f);
 
 void timer(int); // Prototype.
 
@@ -305,6 +307,8 @@ void init(void)
 
 	// Keep
 	inner_tower.BufferShape();
+	keep.BufferShape();
+	entrance.BufferShape();
 
 	// Enable depth testing and face culling. 
 	glEnable(GL_DEPTH_TEST);
@@ -465,6 +469,8 @@ void display(void)
 	frontRight_tower.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(59.5f, 10.0f, -12.5f));
 	frontRight_cone.DrawShape(GL_TRIANGLES, program);
+
+	// Stair for the main gate
 	transformObject(glm::vec3(4.0f, 0.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.0f, -7.0f));
 	cube.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(4.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.5f, -7.0f));
@@ -472,11 +478,37 @@ void display(void)
 
 	// Main gate
 	glBindTexture(GL_TEXTURE_2D, doorID);
-	transformObject(glm::vec3(10.0f, 6.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 1.0f, -6.0f));
+	transformObject(glm::vec3(10.0f, 6.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 1.0f, -6.9f));
+	gate.RecolorShape(1.0f, 1.0f, 1.0f, 1.0f);
+	gate.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(10.0f, 7.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 0.0f, -10.1f));
+	gate.RecolorShape(0, 0, 0, 1);
 	gate.DrawShape(GL_TRIANGLES, program);
 
 	// Keep
 	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(31.0f, 28.0f, 31.0f), X_AXIS, 0.0f, glm::vec3(37.0f, 0.0f, -74.0f));
+	keep.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(8.0f, 10.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 0.0f, -44.0f));
+	entrance.DrawShape(GL_TRIANGLES, program);
+
+	// Stair for keep's entrance
+	transformObject(glm::vec3(4.0f, 1.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(56.0f, 0.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(3.0f, 1.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(56.0f, 1.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(2.0f, 1.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(56.0f, 2.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(56.0f, 3.0f, -42.0f));
+	cube.DrawShape(GL_TRIANGLES, program);
+
+	// Keep's gate
+	glBindTexture(GL_TEXTURE_2D, doorID);
+	transformObject(glm::vec3(4.0f, 3.0f, 1.0f), Y_AXIS, 90.0f, glm::vec3(56.1f, 4.0f, -38.0f));
+	gate.RecolorShape(1.0f, 1.0f, 1.0f, 1.0f);
+	gate.DrawShape(GL_TRIANGLES, program);
+	glBindTexture(GL_TEXTURE_2D, brickID);
+
 	transformObject(glm::vec3(5.0f, 30.0f, 5.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 0.0f, -45.0f));
 	inner_tower.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(35.0f, 30.0f, -45.0f));
