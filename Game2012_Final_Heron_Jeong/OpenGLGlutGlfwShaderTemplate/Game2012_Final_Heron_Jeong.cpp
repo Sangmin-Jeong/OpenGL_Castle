@@ -53,7 +53,7 @@ using namespace std;
 #define YZ_AXIS glm::vec3(0,1,1)
 #define XZ_AXIS glm::vec3(1,0,1)
 #define XYZ_AXIS glm::vec3(1,1,1)
-#define SPEED 0.25f
+#define SPEED 0.5f
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -88,7 +88,7 @@ GLint width, height, bitDepth;
 // Light objects. Now OOP.
 AmbientLight aLight(
 	glm::vec3(1.0f, 1.0f, 0.9f),	// Diffuse colour.
-	0.5f);
+	0.3f);
 
 PointLight pLights[2] = {
 	{ glm::vec3(50.0f, 10.0f, 0.0f),	// Position.
@@ -97,7 +97,7 @@ PointLight pLights[2] = {
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f },							// Diffuse strength.
 
-	{ glm::vec3(50.0f, 44.0f, -50.f),	// Position.
+	{ glm::vec3(50.0f, 35.0f, -35.f),	// Position.
 	1000.0f,							// Range.
 	1.0f, 4.5f, 75.0f,				// Constant, Linear, Quadratic.   
 	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
@@ -154,7 +154,7 @@ void timer(int); // Prototype.
 
 void resetView()
 {
-	position = glm::vec3(53.0f, 3.0f, 25.0f); // Super pulled back because of grid size.
+	position = glm::vec3(50.0f, 30.0f, 90.0f); // Super pulled back because of grid size.
 	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0.0f;
@@ -442,21 +442,20 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -13.0f));
 	frontLeft_tower.DrawShape(GL_TRIANGLES, program);
-	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -13.5f));
-	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
-
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -13.0f));
 	frontRight_tower.DrawShape(GL_TRIANGLES, program);
-	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(84.5f, 13.0f, -13.5f));
-	frontRight_cone.DrawShape(GL_TRIANGLES, program);
-
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(7.0f, 0.0f, -93.0f));
 	backLeft_tower.DrawShape(GL_TRIANGLES, program);
-	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -93.5f));
-	backLeft_cone.DrawShape(GL_TRIANGLES, program);
-
 	transformObject(glm::vec3(8.0f, 13.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(85.0f, 0.0f, -93.0f));
 	backRight_tower.DrawShape(GL_TRIANGLES, program);
+
+	glBindTexture(GL_TEXTURE_2D, woodID);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -13.5f));
+	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(84.5f, 13.0f, -13.5f));
+	frontRight_cone.DrawShape(GL_TRIANGLES, program);
+	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(6.5f, 13.0f, -93.5f));
+	backLeft_cone.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(9.0f, 3.0f, 9.0f), X_AXIS, 0.0f, glm::vec3(84.5f, 13.0f, -93.5f));
 	backRight_cone.DrawShape(GL_TRIANGLES, program);
 
@@ -464,17 +463,20 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(6.0f, 10.0f, 6.0f), X_AXIS, 0.0f, glm::vec3(40.0f, 0.0f, -12.0f));
 	frontLeft_tower.DrawShape(GL_TRIANGLES, program);
-	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(39.5f, 10.0f, -12.5f));
-	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(6.0f, 10.0f, 6.0f), X_AXIS, 0.0f, glm::vec3(60.0f, 0.0f, -12.0f));
 	frontRight_tower.DrawShape(GL_TRIANGLES, program);
+
+	glBindTexture(GL_TEXTURE_2D, woodID);
+	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(39.5f, 10.0f, -12.5f));
+	frontLeft_cone.DrawShape(GL_TRIANGLES, program);
 	transformObject(glm::vec3(7.0f, 2.0f, 7.0f), X_AXIS, 0.0f, glm::vec3(59.5f, 10.0f, -12.5f));
 	frontRight_cone.DrawShape(GL_TRIANGLES, program);
 
 	// Stair for the main gate
-	transformObject(glm::vec3(4.0f, 0.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.0f, -7.0f));
+	glBindTexture(GL_TEXTURE_2D, brickID);
+	transformObject(glm::vec3(6.0f, 0.5f, 1.0f), X_AXIS, 0.0f, glm::vec3(50.0f, 0.0f, -7.0f));
 	cube.DrawShape(GL_TRIANGLES, program);
-	transformObject(glm::vec3(4.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(51.0f, 0.5f, -7.0f));
+	transformObject(glm::vec3(6.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(50.0f, 0.5f, -7.0f));
 	cube.DrawShape(GL_TRIANGLES, program);
 
 	// Main gate
@@ -490,8 +492,15 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, brickID);
 	transformObject(glm::vec3(31.0f, 28.0f, 31.0f), X_AXIS, 0.0f, glm::vec3(37.0f, 0.0f, -74.0f));
 	keep.DrawShape(GL_TRIANGLES, program);
-	transformObject(glm::vec3(8.0f, 10.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(48.0f, 0.0f, -44.0f));
+	BuildBattlementsX(28, 36.0f, 28.0f, -44.0f);
+	BuildBattlementsX(28, 36.0f, 28.0f, -74.0f);
+	BuildBattlementsZ(28, 37.0f, 28.0f, -44.0f);
+	BuildBattlementsZ(28, 67.0f, 28.0f, -44.0f);
+	transformObject(glm::vec3(9.0f, 10.0f, 8.0f), X_AXIS, 0.0f, glm::vec3(47.0f, 0.0f, -44.0f));
 	entrance.DrawShape(GL_TRIANGLES, program);
+	BuildBattlementsX(7, 47.0f, 10.0f, -37.0f);
+	BuildBattlementsZ(7, 47.0f, 10.0f, -37.0f);
+	BuildBattlementsZ(7, 55.0f, 10.0f, -37.0f);
 
 	// Stair for keep's entrance
 	transformObject(glm::vec3(4.0f, 1.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(56.0f, 0.0f, -42.0f));
@@ -505,7 +514,7 @@ void display(void)
 
 	// Keep's gate
 	glBindTexture(GL_TEXTURE_2D, doorID);
-	transformObject(glm::vec3(4.0f, 3.0f, 1.0f), Y_AXIS, 90.0f, glm::vec3(56.1f, 4.0f, -38.0f));
+	transformObject(glm::vec3(7.0f, 3.0f, 1.0f), Y_AXIS, 90.0f, glm::vec3(56.1f, 4.0f, -36.5f));
 	gate.RecolorShape(1.0f, 1.0f, 1.0f, 1.0f);
 	gate.DrawShape(GL_TRIANGLES, program);
 	glBindTexture(GL_TEXTURE_2D, brickID);
